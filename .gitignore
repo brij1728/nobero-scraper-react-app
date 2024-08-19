@@ -1,0 +1,61 @@
+# Ignore virtual environment directories
+.venv/
+venv/
+ENV/
+
+# Ignore Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+*.egg-info/
+dist/
+build/
+eggs/
+
+# Django / Flask related
+*.log
+db.sqlite3
+*.pot
+instance/
+.webassets-cache
+
+# Scrapy related
+.scrapy/
+logs/
+items.json
+items.csv
+*.tmp
+*.log
+
+# Node.js / React related
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Log files
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Ignore IDE configuration directories
+.vscode/
+.idea/
+
+# Ignore build directories and files
+build/
+dist/
+out/
+
+# Ignore bundler and cache directories
+.cache/
+coverage/
+*.tgz
+
+# Ignore temporary files
+*.tmp
+*.swp
