@@ -4,15 +4,17 @@
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
+from scrapy.http import Response, Request
+from scrapy.exceptions import IgnoreRequest
 
 # useful for handling different item types with a single interface
 from itemadapter import is_item, ItemAdapter
 
 
 class ScrapyProjectSpiderMiddleware:
-    # Not all methods need to be defined. If a method is not defined,
-    # scrapy acts as if the spider middleware does not modify the
-    # passed objects.
+    """
+    Spider middleware is responsible for processing the spider input/output.
+    """
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -22,44 +24,62 @@ class ScrapyProjectSpiderMiddleware:
         return s
 
     def process_spider_input(self, response, spider):
-        # Called for each response that goes through the spider
-        # middleware and into the spider.
-
-        # Should return None or raise an exception.
+        """
+        Called for each response that goes through the spider middleware
+        and into the spider.
+        :param response: Response object
+        :param spider: The spider instance
+        :return: None or raise an exception
+        """
+        # Example: You can perform additional checks or processing on the response here.
         return None
 
     def process_spider_output(self, response, result, spider):
-        # Called with the results returned from the Spider, after
-        # it has processed the response.
-
-        # Must return an iterable of Request, or item objects.
-        for i in result:
-            yield i
+        """
+        Called with the results returned from the Spider after
+        it has processed the response.
+        :param response: Response object
+        :param result: The output from the spider (could be items or more requests)
+        :param spider: The spider instance
+        :return: Iterable of Request, or item objects
+        """
+        for item in result:
+            yield item
 
     def process_spider_exception(self, response, exception, spider):
-        # Called when a spider or process_spider_input() method
-        # (from other spider middleware) raises an exception.
-
-        # Should return either None or an iterable of Request or item objects.
+        """
+        Called when an exception is raised while processing the response in the spider.
+        :param response: Response object
+        :param exception: The exception raised
+        :param spider: The spider instance
+        :return: None or an iterable of Request or item objects.
+        """
+        spider.logger.error(f"Exception occurred: {exception}")
         pass
 
     def process_start_requests(self, start_requests, spider):
-        # Called with the start requests of the spider, and works
-        # similarly to the process_spider_output() method, except
-        # that it doesn’t have a response associated.
-
-        # Must return only requests (not items).
-        for r in start_requests:
-            yield r
+        """
+        Called with the start requests of the spider before they are processed.
+        :param start_requests: The initial requests from the spider
+        :param spider: The spider instance
+        :return: Iterable of Request objects
+        """
+        for request in start_requests:
+            yield request
 
     def spider_opened(self, spider):
-        spider.logger.info("Spider opened: %s" % spider.name)
+        """
+        Called when the spider is opened.
+        :param spider: The spider instance
+        """
+        spider.logger.info(f"Spider opened: {spider.name}")
 
 
 class ScrapyProjectDownloaderMiddleware:
-    # Not all methods need to be defined. If a method is not defined,
-    # scrapy acts as if the downloader middleware does not modify the
-    # passed objects.
+    """
+    Downloader middleware is responsible for processing the requests and responses
+    between the spider and the downloader.
+    """
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -69,35 +89,44 @@ class ScrapyProjectDownloaderMiddleware:
         return s
 
     def process_request(self, request, spider):
-        # Called for each request that goes through the downloader
-        # middleware.
-
-        # Must either:
-        # - return None: continue processing this request
-        # - or return a Response object
-        # - or return a Request object
-        # - or raise IgnoreRequest: process_exception() methods of
-        #   installed downloader middleware will be called
+        """
+        Called for each request that goes through the downloader middleware.
+        :param request: The request object
+        :param spider: The spider instance
+        :return: None, Response object, or raise IgnoreRequest
+        """
+        # Example: Modify request headers here or log the request
+        spider.logger.info(f"Processing request: {request.url}")
         return None
 
     def process_response(self, request, response, spider):
-        # Called with the response returned from the downloader.
-
-        # Must either;
-        # - return a Response object
-        # - return a Request object
-        # - or raise IgnoreRequest
+        """
+        Called with the response returned from the downloader.
+        :param request: The request object
+        :param response: The response object
+        :param spider: The spider instance
+        :return: Response object or raise IgnoreRequest
+        """
+        # Example: Check for specific status codes and raise IgnoreRequest
+        if response.status == 404:
+            spider.logger.warning(f"404 error encountered at: {request.url}")
+            raise IgnoreRequest
         return response
 
     def process_exception(self, request, exception, spider):
-        # Called when a download handler or a process_request()
-        # (from other downloader middleware) raises an exception.
-
-        # Must either:
-        # - return None: continue processing this exception
-        # - return a Response object: stops process_exception() chain
-        # - return a Request object: stops process_exception() chain
-        pass
+        """
+        Called when a download handler or process_request raises an exception.
+        :param request: The request object
+        :param exception: The exception raised
+        :param spider: The spider instance
+        :return: None or Response object
+        """
+        spider.logger.error(f"Exception occurred for {request.url}: {exception}")
+        return None  # Returning None will continue processing this exception
 
     def spider_opened(self, spider):
-        spider.logger.info("Spider opened: %s" % spider.name)
+        """
+        Called when the spider is opened.
+        :param spider: The spider instance
+        """
+        spider.logger.info(f"Spider opened: {spider.name}")
